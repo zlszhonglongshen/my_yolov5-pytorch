@@ -47,16 +47,14 @@ def evaluate(model, dataloader, iou_thres, conf_thres, nms_thres, img_size):
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--imgroot', default='/home/wangbo/Desktop/data/datasets/VOCdevkit/VOC2012/Annotations', help='image directory path')
-    parser.add_argument('--labroot', default='/home/wangbo/Desktop/data/datasets/VOCdevkit/VOC2012/Annotations', help='label directory path')
-    parser.add_argument('--test_txt', default='/home/wangbo/Desktop/data/datasets/VOCdevkit/VOC2012/ImageSets/Main/val.txt', help='test.txt')
-    parser.add_argument('--labels_txt', default='/home/wangbo/Desktop/data/datasets/VOCdevkit/pascal_voc.names', help='labels.txt')
+    parser.add_argument('--imgroot', default='/home/data/datasets/VOCdevkit/VOC2012/Annotations', help='image directory path')
+    parser.add_argument('--labroot', default='/home/data/datasets/VOCdevkit/VOC2012/Annotations', help='label directory path')
+    parser.add_argument('--test_txt', default='/home/data/datasets/VOCdevkit/VOC2012/ImageSets/Main/val.txt', help='test.txt')
+    parser.add_argument('--labels_txt', default='pascal_voc.names', help='labels.txt')
     parser.add_argument('--imgsize', type=int, default=640, help='image size')
     parser.add_argument('--input_norm', action='store_true', help='Input Normliaze')
-    parser.add_argument('--batchsize', type=int, default=1, help='Batch size, mv2:16, mv3:32')
-    parser.add_argument('--pth', type=str, default='pascal_voc/best.pth', help='train pth path')
-    parser.add_argument('--saveout', type=str, default='', help='save detect image to dir')
-    parser.add_argument("--sample_type", default='nearest', choices=['deconv', 'nearest', 'linear', 'bilinear', 'bicubic', 'trilinear', 'area'])
+    parser.add_argument('--batchsize', type=int, default=8, help='Batch size')
+    parser.add_argument('--pth', type=str, default='pascal_voc.pth', help='train pth path')
     parser.add_argument('--net_type', default='yolov5s', choices=['yolov5s', 'yolov5l', 'yolov5m', 'yolov5x'])
     parser.add_argument("--iou_thres", type=float, default=0.5, help="iou threshold required to qualify as detected")
     parser.add_argument("--conf_thres", type=float, default=0.5, help="object confidence threshold")
@@ -76,15 +74,14 @@ if __name__=="__main__":
                                 collate_fn=testDataSet.collate_fn)
 
     anchors = [[10, 13, 16, 30, 33, 23], [30, 61, 62, 45, 59, 119], [116, 90, 156, 198, 373, 326]]
-    # net = My_YOLO(trainDataSet.num_classes, anchors=anchors)
     if args.net_type == 'yolov5s':
-        net = my_yolov5s(testDataSet.num_classes, anchors=anchors, training=True)
+        net = my_yolov5s(testDataSet.num_classes, anchors=anchors, training=False)
     elif args.net_type == 'yolov5l':
-        net = my_yolov5l(testDataSet.num_classes, anchors=anchors, training=True)
+        net = my_yolov5l(testDataSet.num_classes, anchors=anchors, training=False)
     elif args.net_type == 'yolov5m':
-        net = my_yolov5m(testDataSet.num_classes, anchors=anchors, training=True)
+        net = my_yolov5m(testDataSet.num_classes, anchors=anchors, training=False)
     else:
-        net = my_yolov5x(testDataSet.num_classes, anchors=anchors, training=True)
+        net = my_yolov5x(testDataSet.num_classes, anchors=anchors, training=False)
     net.to(device)
     net.load_state_dict(torch.load(args.pth, map_location=device))
     with torch.no_grad():
